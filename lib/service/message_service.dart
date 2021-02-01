@@ -39,7 +39,6 @@ class MessageService {
 
   Future<void> sendMessage(Room room, String text) async {
     final id = _uuid.v4();
-    await Future.delayed(Duration(seconds: 3));
     final timeout = Timer(_shippingTimeoute, () => throw Exception());
     _messageRepository.send(room, text, id);
     await _shippingStreamController.stream.firstWhere((message) {
