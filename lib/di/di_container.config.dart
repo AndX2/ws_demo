@@ -10,6 +10,7 @@ import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../repository/lifecycle_repository.dart';
 import '../repository/message_repository.dart';
 import '../service/message_service.dart';
 import '../repository/preference_repository.dart';
@@ -32,6 +33,7 @@ Future<GetIt> $initGetIt(
   final sharedPreferenceRegister = _$SharedPreferenceRegister();
   final registerWsClient = _$RegisterWsClient();
   gh.factory<Dio>(() => registerDioClient.createRoomClient());
+  gh.factory<LifeCycleRepository>(() => LifeCycleRepository());
   gh.factoryParam<MessageRepository, String, dynamic>(
       (_userName, _) => MessageRepository(_userName));
   gh.factory<RoomRepository>(() => RoomRepository(get<Dio>()));
@@ -45,8 +47,11 @@ Future<GetIt> $initGetIt(
 
   // Eager singletons must be registered in the right order
   gh.singleton<RoomService>(RoomService(get<RoomRepository>()));
-  gh.singleton<MessageService>(
-      MessageService(get<PreferenceRepository>(), get<RoomService>()));
+  gh.singleton<MessageService>(MessageService(
+    get<PreferenceRepository>(),
+    get<RoomService>(),
+    get<LifeCycleRepository>(),
+  ));
   return get;
 }
 

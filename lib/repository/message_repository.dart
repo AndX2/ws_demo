@@ -3,6 +3,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:ws_demo/di/di_container.dart';
 import 'package:ws_demo/domain/room.dart';
 import 'package:ws_demo/domain/socket_message.dart';
+import 'package:ws_demo/repository/lifecycle_repository.dart';
 import 'package:ws_demo/repository/request/message_request.dart';
 import 'package:ws_demo/repository/response/message_response.dart';
 
@@ -15,7 +16,9 @@ class MessageRepository {
   final String _userName;
   final WebSocketChannel _channel;
 
-  MessageRepository(@factoryParam this._userName) : _channel = getIt.get<WebSocketChannel>(param1: _userName);
+  MessageRepository(
+    @factoryParam this._userName,
+  ) : _channel = getIt.get<WebSocketChannel>(param1: _userName);
 
   /// Поток сообщений сервера
   Stream<SocketMessage> get stream {

@@ -6,6 +6,7 @@ import 'package:ws_demo/di/di_container.dart';
 import 'package:ws_demo/domain/profile.dart';
 import 'package:ws_demo/domain/room.dart';
 import 'package:ws_demo/domain/socket_message.dart';
+import 'package:ws_demo/repository/lifecycle_repository.dart';
 
 import 'package:ws_demo/repository/message_repository.dart';
 import 'package:ws_demo/repository/preference_repository.dart';
@@ -18,6 +19,7 @@ class MessageService {
   MessageRepository _messageRepository;
   final PreferenceRepository _preferenceRepository;
   final RoomService _roomService;
+  final LifeCycleRepository _lifeCycleRepository;
 
   // ignore: close_sinks
   final _shippingStreamController = StreamController<SocketMessage>.broadcast();
@@ -26,7 +28,10 @@ class MessageService {
   MessageService(
     this._preferenceRepository,
     this._roomService,
-  ) : _messageRepository = getIt.get<MessageRepository>(param1: _preferenceRepository.profile.userName);
+    this._lifeCycleRepository,
+  ) : _messageRepository = getIt.get<MessageRepository>(param1: _preferenceRepository.profile.userName) {
+    _lifeCycleRepository.subscribe();
+  }
 
   void subscribe() {
     _messageRepository.stream.forEach(
