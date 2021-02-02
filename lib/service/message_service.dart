@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:uuid/uuid.dart';
 import 'package:ws_demo/di/di_container.dart';
@@ -29,8 +30,11 @@ class MessageService {
     this._preferenceRepository,
     this._roomService,
     this._lifeCycleRepository,
-  ) : _messageRepository = getIt.get<MessageRepository>(param1: _preferenceRepository.profile.userName) {
+  ) : _messageRepository = getIt.get<MessageRepository>(
+            param1: _preferenceRepository.profile.userName) {
     _lifeCycleRepository.subscribe();
+    _lifeCycleRepository
+        .addListener(() => _lifeStateChanged(_lifeCycleRepository.state));
   }
 
   void subscribe() {
@@ -59,7 +63,8 @@ class MessageService {
   Future<void> setProfile(Profile profile) async {
     _messageRepository.close();
     await _preferenceRepository.saveProfile(profile);
-    _messageRepository = getIt.get<MessageRepository>(param1: _preferenceRepository.profile.userName);
+    _messageRepository = getIt.get<MessageRepository>(
+        param1: _preferenceRepository.profile.userName);
     subscribe();
   }
 
@@ -82,5 +87,13 @@ class MessageService {
     roomList.add(room);
     _roomService.roomListObservable.add(roomList);
     return room;
+  }
+
+  void _lifeStateChanged(AppLifecycleState state) {
+    print('______________________________$state');
+    if (state == AppLifecycleState.paused) _messageRepository.close();
+    if (state == AppLifecycleState.resumed)
+      _messageRepository = getIt.get<MessageRepository>(
+          param1: _preferenceRepository.profile.userName);
   }
 }

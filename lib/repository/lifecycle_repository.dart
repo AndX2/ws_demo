@@ -2,21 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
-class LifeCycleRepository with WidgetsBindingObserver {
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   WidgetsBinding.instance.addObserver(this);
-  // }
+class LifeCycleRepository with WidgetsBindingObserver, ChangeNotifier {
+  AppLifecycleState _appState;
 
-  // @override
-  // void dispose() {
-  //   WidgetsBinding.instance.removeObserver(this);
-  //   super.dispose();
-  // }
-
-  AppLifecycleState _notification;
-
+  AppLifecycleState get state => _appState;
   void subscribe() {
     WidgetsBinding.instance.addObserver(this);
   }
@@ -27,12 +16,7 @@ class LifeCycleRepository with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print('______________________________$state');
-    // setState(() { _notification = state; });
+    _appState = state;
+    notifyListeners();
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return new Text('Last notification: $_notification');
-  // }
 }
