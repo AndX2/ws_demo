@@ -30,11 +30,9 @@ class MessageService {
     this._preferenceRepository,
     this._roomService,
     this._lifeCycleRepository,
-  ) : _messageRepository = getIt.get<MessageRepository>(
-            param1: _preferenceRepository.profile.userName) {
+  ) : _messageRepository = getIt.get<MessageRepository>(param1: _preferenceRepository.profile.userName) {
     _lifeCycleRepository.subscribe();
-    _lifeCycleRepository
-        .addListener(() => _lifeStateChanged(_lifeCycleRepository.state));
+    _lifeCycleRepository.addListener(() => _lifeStateChanged(_lifeCycleRepository.state));
   }
 
   void subscribe() {
@@ -63,8 +61,7 @@ class MessageService {
   Future<void> setProfile(Profile profile) async {
     _messageRepository.close();
     await _preferenceRepository.saveProfile(profile);
-    _messageRepository = getIt.get<MessageRepository>(
-        param1: _preferenceRepository.profile.userName);
+    _messageRepository = getIt.get<MessageRepository>(param1: _preferenceRepository.profile.userName);
     subscribe();
   }
 
@@ -90,10 +87,12 @@ class MessageService {
   }
 
   void _lifeStateChanged(AppLifecycleState state) {
-    print('______________________________$state');
+    // print(state);
     if (state == AppLifecycleState.paused) _messageRepository.close();
-    if (state == AppLifecycleState.resumed)
-      _messageRepository = getIt.get<MessageRepository>(
-          param1: _preferenceRepository.profile.userName);
+    if (state == AppLifecycleState.resumed) {
+      _messageRepository = getIt.get<MessageRepository>(param1: _preferenceRepository.profile.userName);
+      subscribe();
+      _messageRepository.ping();
+    }
   }
 }

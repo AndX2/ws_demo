@@ -3,7 +3,6 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:ws_demo/di/di_container.dart';
 import 'package:ws_demo/domain/room.dart';
 import 'package:ws_demo/domain/socket_message.dart';
-import 'package:ws_demo/repository/lifecycle_repository.dart';
 import 'package:ws_demo/repository/request/message_request.dart';
 import 'package:ws_demo/repository/response/message_response.dart';
 
@@ -33,6 +32,8 @@ class MessageRepository {
     final msg = messageRequest.toJson;
     _channel.sink.add(msg);
   }
+
+  void ping() => _channel.sink.add({"ping": true});
 
   /// Закрыть канал
   void close() {
