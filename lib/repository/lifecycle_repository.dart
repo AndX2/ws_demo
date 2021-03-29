@@ -12,6 +12,7 @@ class LifeCycleRepository with WidgetsBindingObserver, ChangeNotifier {
 
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override

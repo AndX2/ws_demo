@@ -11,6 +11,7 @@ abstract class RegisterWsClient {
   WebSocketChannel createWsClient(@factoryParam String userName) {
     final url = consts.Url.messageChannel(userName);
     final channel = IOWebSocketChannel.connect(url);
+    // final channel = HtmlWebSocketChannel.connect(url);
     return channel;
   }
 }
