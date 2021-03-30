@@ -12,7 +12,7 @@ import 'package:ws_demo/domain/room.dart';
 /// ```
 @immutable
 class MessageRequest {
-  final Room room;
+  final Channel room;
   final String text;
   final String id;
 

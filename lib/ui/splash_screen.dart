@@ -1,11 +1,11 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:flutter_svg/flutter_svg.dart';
-
 import 'package:mwwm/mwwm.dart';
-import 'package:ws_demo/ui/widget/screen_back.dart';
 
+import 'package:ws_demo/ui/widget/screen_back.dart';
 import 'package:ws_demo/util/const.dart';
 
 /// Время до закрытия Splash экрана
@@ -40,7 +40,9 @@ class _SplashScreenWidgetState extends WidgetState<SplashScreenModel> {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: Center(
-            child: SvgPicture.asset(ImageRes.logo, width: 200.0),
+            child: kIsWeb
+                ? Image.network(ImageRes.logo)
+                : SvgPicture.asset(ImageRes.logo, width: 200.0),
           ),
         ),
       ),

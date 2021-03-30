@@ -21,19 +21,39 @@ class MessageRepository {
 
   /// Поток сообщений сервера
   Stream<SocketMessage> get stream {
-    return _channel.stream.map<SocketMessage>(
-      (row) => SocketMessageResponse.fromJson(row).transform(),
-    );
+    return _channel.stream.where((row) {
+      if (row is String && row.length == 1) {
+        print(row.codeUnits);
+        if (row.codeUnits.first == 0xA) _onPong();
+        if (row.codeUnits.first == 0x9) _onPing();
+        return false;
+      }
+      return true;
+    }).map<SocketMessage>((row) => SocketMessageResponse.fromJson(row).transform());
   }
 
+  void _onPing() {
+    print('ping');
+  }
+
+  void _onPong() {
+    print('pong');
+  }
+
+  // if (ping is String) {
+  //     print(ping.length);
+  //     print(ping.codeUnits);
+  //   }
+
   /// Отправить сообщение
-  void send(Room room, String text, String id) {
+  void send(Channel room, String text, String id) {
     final messageRequest = MessageRequest(room, text, id);
     final msg = messageRequest.toJson;
     _channel.sink.add(msg);
   }
 
-  void ping() => _channel.sink.add({"ping": true});
+  void ping() {}
+  // void ping() => _channel.sink.add({"ping": true});
 
   /// Закрыть канал
   void close() {

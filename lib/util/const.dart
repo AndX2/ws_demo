@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import 'package:ws_demo/domain/room.dart';
 
 /// Паттерны экранирования символов в URL (для имени пользователя)
@@ -30,17 +28,26 @@ const Map<String, String> _pathSegmentReplacement = {
 
 /// Статические URL используемые приложением (динамические в [RemoteConfigFactory])
 class Url {
-  static const String httpBaseUrl = 'https://nane.tada.team';
-  static const String wsBaseUrl = 'wss://nane.tada.team/ws';
+  static const String httpBaseUrl = 'https://dartservice.ru/messenger';
+  static const String wsBaseUrl = 'wss://dartservice.ru/messenger/ws';
 
   /// История последних сообщений в канале
-  static String roomHistory(Room room) => '/api/rooms/${cleanUrlPathSegment(room.name)}/history';
+  static String roomHistory(Channel room) => '/api/rooms/${cleanUrlPathSegment(room.name)}/history';
 
   /// Список всех каналов
-  static const String roomList = '/api/rooms';
+  static const String roomList = '/channel';
 
   /// WS канал сообщений
-  static String messageChannel(String userName) => '$wsBaseUrl?username=$userName';
+  static const String messageChannel = wsBaseUrl;
+
+  /// Эндпойнт авторизации
+  static const String signIn = '/auth/signin';
+
+  /// Эндпойнт регистрации
+  static const String signUp = '/auth/signup';
+
+  /// Эндпойнт обновления токенов
+  static const String refresh = '/auth/refresh';
 
   /// Экранирование недопустимых символов в полях, используемых в Url
   static String cleanUrlPathSegment(String pathSegment) {

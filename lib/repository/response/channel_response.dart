@@ -21,19 +21,19 @@ import 'package:ws_demo/util/transformable.dart';
 ///        ]
 ///      }
 ///   ```
-class RoomListResponse extends Transformable<List<Room>> {
-  var _roomList = List<Room>();
+class ChannelListResponse extends Transformable<List<Channel>> {
+  var _roomList = List<Channel>();
 
-  RoomListResponse.fromJson(dynamic json) {
+  ChannelListResponse.fromJson(dynamic json) {
     final List<dynamic> data = json['result'];
-    _roomList.addAll(data.map<Room>((item) => RoomResponse.fromJson(item).transform()));
+    _roomList.addAll(data.map<Channel>((item) => RoomResponse.fromJson(item).transform()));
   }
 
   @override
-  List<Room> transform() => _roomList;
+  List<Channel> transform() => _roomList;
 }
 
-/// Ответ сервера [Room]
+/// Ответ сервера [Channel]
 ///   ```json
 ///        {
 ///            "name": "Тупичок",
@@ -47,7 +47,7 @@ class RoomListResponse extends Transformable<List<Room>> {
 ///            }
 ///        }
 ///   ```
-class RoomResponse extends Transformable<Room> {
+class RoomResponse extends Transformable<Channel> {
   String _name;
   Message _lastMessage;
 
@@ -58,7 +58,7 @@ class RoomResponse extends Transformable<Room> {
   }
 
   @override
-  Room transform() {
-    return Room(_name)..messageList.add(_lastMessage);
+  Channel transform() {
+    return Channel(_name)..messageList.add(_lastMessage);
   }
 }

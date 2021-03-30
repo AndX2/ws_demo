@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:ws_demo/domain/message.dart';
 import 'package:ws_demo/domain/sender.dart';
 import 'package:ws_demo/domain/socket_message.dart';
-import 'package:ws_demo/repository/response/sender_response.dart';
 import 'package:ws_demo/util/transformable.dart';
 
 /// Ответ сервера [List<Message>]
@@ -54,19 +53,23 @@ class MessageListResponse extends Transformable<List<Message>> {
 ///
 class MessageResponse extends Transformable<Message> {
   DateTime _created;
-  Sender _sender;
-  String _text;
+  Owner _owner;
+  String _body;
 
   @override
   MessageResponse.fromJson(dynamic json) {
-    _created = DateTime.parse(json['created']);
-    _sender = SenderResponse.fromJson(json['sender']).transform();
-    _text = json['text'];
+    final msg = json['message'];
+    _created = DateTime.parse(msg['created']);
+    _owner = Owner(
+      msg['ownerId'],
+      msg['ownerName'],
+    );
+    _body = msg['text'];
   }
 
   @override
   Message transform() {
-    final message = Message(_created, _sender, _text);
+    final message = Message(_created, _owner, _body);
     // print(message.toJson());
     return message;
   }
@@ -87,29 +90,46 @@ class MessageResponse extends Transformable<Message> {
 ///
 class SocketMessageResponse extends Transformable<SocketMessage> {
   DateTime _created;
-  Sender _sender;
-  String _text;
-  String _roomName;
+  Owner _owner;
+  String _body;
+  String _channel;
   String _id;
 
   @override
   SocketMessageResponse.fromJson(dynamic json) {
     json = jsonDecode(json);
-    _created = DateTime.parse(json['created']);
-    _sender = SenderResponse.fromJson(json['sender']).transform();
-    _text = json['text'];
-    _roomName = json['room'];
-    _id = json['id'];
+    final msg = json['message'];
+    _created = DateTime.parse(msg['created']);
+    _owner = Owner(
+      msg['ownerName'],
+      msg['ownerName'],
+    );
+    _body = msg['body'];
+    _channel = json['channel'];
+    _id = msg['id'];
   }
 
   @override
   SocketMessage transform() {
     return SocketMessage(
-      _roomName,
+      _channel,
       _id,
       _created,
-      _sender,
-      _text,
+      _owner,
+      _body,
     );
   }
 }
+
+final rowMsg = {
+  "channel": "quotes",
+  "message": {
+    "publicId": "7111b46f-6f0b-402c-b190-786f2917b89c",
+    "ownerId": "2d41c742-8436-4eb7-a458-4a2ab80fb7e6",
+    "ownerName": "Spamer",
+    "created": "2021-03-29T23:25:53.360511",
+    "assets": [],
+    "body":
+        "Всегда пишите код так, будто сопровождать его будет склонный к насилию психопат, который знает, где вы живете. Martin Golding"
+  }
+};

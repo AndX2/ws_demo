@@ -5,22 +5,39 @@ import 'package:ws_demo/domain/sender.dart';
 
 @immutable
 class SocketMessage extends Message {
-  final String roomName;
+  final String channel;
   final String id;
 
   SocketMessage(
-    this.roomName,
+    this.channel,
     this.id,
     DateTime created,
-    Sender sender,
-    String text,
-  ) : super(created, sender, text);
+    Owner owner,
+    String body,
+  ) : super(created, owner, body);
 
   Map toJson() => {
-        'room': roomName,
-        'id': id,
-        'created': created.toIso8601String(),
-        'sender': sender.toJson(),
-        'text': text,
+        'channel': channel,
+        'message': {
+          "publicId": id,
+          "ownerId": owner.ownerId,
+          "ownerName": owner.ownerName,
+          "created": created.toIso8601String(),
+          "assets": [],
+          "body": body,
+        }
       };
 }
+
+final rowMsg = {
+  "channel": "quotes",
+  "message": {
+    "publicId": "7111b46f-6f0b-402c-b190-786f2917b89c",
+    "ownerId": "2d41c742-8436-4eb7-a458-4a2ab80fb7e6",
+    "ownerName": "Spamer",
+    "created": "2021-03-29T23:25:53.360511",
+    "assets": [],
+    "body":
+        "Всегда пишите код так, будто сопровождать его будет склонный к насилию психопат, который знает, где вы живете. Martin Golding"
+  }
+};

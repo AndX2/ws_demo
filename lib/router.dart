@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ws_demo/ui/channel_screen.dart';
 import 'package:ws_demo/ui/main_screen.dart';
-import 'package:ws_demo/ui/room_screen.dart';
 import 'package:ws_demo/ui/splash_screen.dart';
 import 'package:ws_demo/ui/widget/route_not_found.dart';
 
@@ -32,7 +32,8 @@ class RouterDelegate {
         return CupertinoPageRoute(builder: (context) => MainScreenWidget());
         break;
       case Routes.room:
-        return CupertinoPageRoute(builder: (context) => RoomScreenWidget(roomName: params[Routes.roomName]));
+        return CupertinoPageRoute(
+            builder: (context) => ChannelScreenWidget(roomName: params[Routes.roomName]));
         break;
       default:
         return CupertinoPageRoute(builder: (context) => RouteNotFoundWidget(settings: settings));

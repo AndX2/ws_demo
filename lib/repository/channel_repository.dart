@@ -1,27 +1,28 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
+
 import 'package:ws_demo/domain/message.dart';
 import 'package:ws_demo/domain/room.dart';
+import 'package:ws_demo/repository/response/channel_response.dart';
 import 'package:ws_demo/repository/response/message_response.dart';
-import 'package:ws_demo/repository/response/room_response.dart';
 import 'package:ws_demo/util/const.dart' as consts;
 
-/// Репозиторий для комнат (каналов)
+/// Репозиторий для каналов
 @injectable
-class RoomRepository {
+class ChannelRepository {
   final Dio _httpClient;
 
-  RoomRepository(this._httpClient);
+  ChannelRepository(this._httpClient);
 
   /// Получить список каналов
-  Future<List<Room>> fetchRoomList() {
+  Future<List<Channel>> fetchRoomList() {
     return _httpClient
         .get(consts.Url.roomList)
-        .then((response) => RoomListResponse.fromJson(response.data).transform());
+        .then((response) => ChannelListResponse.fromJson(response.data).transform());
   }
 
   /// Получить историю сообщений в канале
-  Future<List<Message>> fetchMessageList(Room room) async {
+  Future<List<Message>> fetchMessageList(Channel room) async {
     return _httpClient.get(consts.Url.roomHistory(room)).then((response) {
       return MessageListResponse.fromJson(response.data).transform();
     });

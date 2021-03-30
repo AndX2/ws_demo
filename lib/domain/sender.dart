@@ -2,20 +2,20 @@ import 'package:flutter/foundation.dart';
 
 /// Отправитель сообщений
 @immutable
-class Sender {
-  final String username;
+class Owner {
+  final String ownerName;
+  final String ownerId;
 
-  Sender(this.username);
+  Owner(
+    this.ownerName,
+    this.ownerId,
+  );
 
   @override
   operator ==(other) {
-    return (other is Sender) && other.username == this.username;
+    return (other is Owner) && other.ownerId == this.ownerId;
   }
 
   @override
   int get hashCode => super.hashCode;
-
-  Map toJson() => {
-        'username': username,
-      };
 }

@@ -33,7 +33,10 @@ class ChatMessageWidget extends StatelessWidget {
           Positioned.fill(
             child: ClipPath(
               clipper: _ChatMessageClipper(owner),
-              child: Container(color: owner == ChatMessageOwner.mine ? ColorRes.msgBackBlue : ColorRes.msgBackYellow),
+              child: Container(
+                  color: owner == ChatMessageOwner.mine
+                      ? ColorRes.msgBackBlue
+                      : ColorRes.msgBackYellow),
             ),
           ),
           Positioned.fill(
@@ -44,8 +47,10 @@ class ChatMessageWidget extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Text(
-              message.text,
-              style: context.sp(owner == ChatMessageOwner.mine ? StyleRes.content24Blue : StyleRes.content24Yellow),
+              message.body,
+              style: context.sp(owner == ChatMessageOwner.mine
+                  ? StyleRes.content24Blue
+                  : StyleRes.content24Yellow),
             ),
           ),
         ],

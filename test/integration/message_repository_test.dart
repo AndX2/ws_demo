@@ -29,7 +29,7 @@ Future sendReceiveMessage(MessageRepository repository) async {
     () async {
       final uuid = Uuid();
 
-      final room = Room('AndX2_unit_test_room');
+      final room = Channel('AndX2_unit_test_room');
       final text = 'Random string';
       final id = uuid.v4();
 

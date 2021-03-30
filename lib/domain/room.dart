@@ -6,15 +6,15 @@ import 'package:ws_demo/domain/message.dart';
 /// Room.name используется в качестве сегмента Url path
 /// необходима проверка валидности
 @immutable
-class Room extends Comparable {
+class Channel extends Comparable {
   final String name;
   final List<Message> messageList = [];
 
-  Room(this.name);
+  Channel(this.name);
 
   @override
   operator ==(other) {
-    return (other is Room) && other.name == this.name;
+    return (other is Channel) && other.name == this.name;
   }
 
   @override
@@ -22,7 +22,7 @@ class Room extends Comparable {
 
   @override
   int compareTo(dynamic other) {
-    if (!(other is Room)) throw FormatException('Room.compareTo(other) => other is\'nt Room');
+    if (!(other is Channel)) throw FormatException('Room.compareTo(other) => other is\'nt Room');
     return this.lastMessage.compareTo(other.lastMessage);
   }
 

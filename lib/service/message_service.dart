@@ -11,15 +11,16 @@ import 'package:ws_demo/repository/lifecycle_repository.dart';
 
 import 'package:ws_demo/repository/message_repository.dart';
 import 'package:ws_demo/repository/preference_repository.dart';
-import 'package:ws_demo/service/room_service.dart';
+import 'package:ws_demo/service/channel_service.dart';
 
 const _shippingTimeoute = Duration(seconds: 10);
 
+/// Сервис для получения / отправки сообщений
 @singleton
 class MessageService {
   MessageRepository _messageRepository;
   final PreferenceRepository _preferenceRepository;
-  final RoomService _roomService;
+  final ChannelService _roomService;
   final LifeCycleRepository _lifeCycleRepository;
 
   // ignore: close_sinks
@@ -30,7 +31,8 @@ class MessageService {
     this._preferenceRepository,
     this._roomService,
     this._lifeCycleRepository,
-  ) : _messageRepository = getIt.get<MessageRepository>(param1: _preferenceRepository.profile.userName) {
+  ) : _messageRepository =
+            getIt.get<MessageRepository>(param1: _preferenceRepository.profile.name) {
     _lifeCycleRepository.subscribe();
     _lifeCycleRepository.addListener(() => _lifeStateChanged(_lifeCycleRepository.state));
   }
@@ -38,13 +40,13 @@ class MessageService {
   void subscribe() {
     _messageRepository.stream.forEach(
       (SocketMessage message) {
-        // print(message.toJson());
+        print(message);
         _onReceiveMessage(message);
       },
     );
   }
 
-  Future<void> sendMessage(Room room, String text) async {
+  Future<void> sendMessage(Channel room, String text) async {
     final id = _uuid.v4();
     final timeout = Timer(_shippingTimeoute, () => throw Exception());
     _messageRepository.send(room, text, id);
@@ -54,22 +56,11 @@ class MessageService {
     });
   }
 
-  Profile getProfile() {
-    return getIt.get<PreferenceRepository>().profile;
-  }
-
-  Future<void> setProfile(Profile profile) async {
-    _messageRepository.close();
-    await _preferenceRepository.saveProfile(profile);
-    _messageRepository = getIt.get<MessageRepository>(param1: _preferenceRepository.profile.userName);
-    subscribe();
-  }
-
   void _onReceiveMessage(SocketMessage message) {
     _shippingStreamController.sink.add(message);
     final roomList = _roomService.roomListObservable.value;
     final targetRoom = roomList.firstWhere(
-      (room) => room.name == message.roomName,
+      (room) => room.name == message.channel,
       orElse: () => _addRoom(message),
     );
     if (!targetRoom.messageList.contains(message)) {
@@ -78,9 +69,9 @@ class MessageService {
     }
   }
 
-  Room _addRoom(SocketMessage message) {
+  Channel _addRoom(SocketMessage message) {
     final roomList = _roomService.roomListObservable.value;
-    final room = Room(message.roomName)..messageList.add(message);
+    final room = Channel(message.channel)..messageList.add(message);
     roomList.add(room);
     _roomService.roomListObservable.add(roomList);
     return room;
@@ -90,7 +81,7 @@ class MessageService {
     // print(state);
     if (state == AppLifecycleState.paused) _messageRepository.close();
     if (state == AppLifecycleState.resumed) {
-      _messageRepository = getIt.get<MessageRepository>(param1: _preferenceRepository.profile.userName);
+      _messageRepository = getIt.get<MessageRepository>(param1: _preferenceRepository.profile.name);
       subscribe();
       _messageRepository.ping();
     }

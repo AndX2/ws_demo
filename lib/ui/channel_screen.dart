@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart' hide Action;
 import 'package:mwwm/mwwm.dart';
 import 'package:relation/relation.dart';
+
 import 'package:ws_demo/di/di_container.dart';
 import 'package:ws_demo/domain/message.dart';
 import 'package:ws_demo/domain/profile.dart';
 import 'package:ws_demo/domain/room.dart';
+import 'package:ws_demo/service/auth_service.dart';
+import 'package:ws_demo/service/channel_service.dart';
 import 'package:ws_demo/service/message_service.dart';
-import 'package:ws_demo/service/room_service.dart';
 import 'package:ws_demo/ui/widget/chat_message.dart';
 import 'package:ws_demo/ui/widget/room_header.dart';
 import 'package:ws_demo/ui/widget/screen_back.dart';
@@ -16,10 +18,10 @@ import 'package:ws_demo/util/ui_util.dart';
 const _onMessageScrollDelay = Duration(milliseconds: 33);
 const _autoScrollSpeed = Duration(milliseconds: 400);
 
-///View
-class RoomScreenWidget extends CoreMwwmWidget {
+/// Экран списка сообщений канала
+class ChannelScreenWidget extends CoreMwwmWidget {
   final String roomName;
-  RoomScreenWidget({
+  ChannelScreenWidget({
     Key key,
     @required this.roomName,
   }) : super(
@@ -91,7 +93,7 @@ class _RoomWidgetState extends WidgetState<RoomModel> {
         itemBuilder: (_, index) => ChatMessageWidget(
           key: list[index].key,
           message: list[index],
-          owner: list[index].owner(profile),
+          owner: list[index].isOwner(profile),
         ),
       ),
     );
@@ -150,21 +152,23 @@ class _RoomWidgetState extends WidgetState<RoomModel> {
   }
 }
 
-/// [RoomModel] для [Room]
+/// [RoomModel] для [Channel]
 class RoomModel extends WidgetModel {
-  /// пришедшие данные извне
-  final String roomName;
-  final NavigatorState _rootNavigator;
-  final RoomService _roomService;
-  final MessageService _messageService;
-
   RoomModel(
     WidgetModelDependencies dependencies,
     this.roomName,
     this._rootNavigator,
-  )   : _roomService = getIt.get<RoomService>(),
+  )   : _channelService = getIt.get<ChannelService>(),
         _messageService = getIt.get<MessageService>(),
+        _authService = getIt<AuthService>(),
         super(dependencies);
+
+  /// пришедшие данные извне
+  final String roomName;
+  final NavigatorState _rootNavigator;
+  final ChannelService _channelService;
+  final MessageService _messageService;
+  final AuthService _authService;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final scrollController = ScrollController();
@@ -178,7 +182,7 @@ class RoomModel extends WidgetModel {
   void onLoad() {
     super.onLoad();
     _init();
-    subscribe<List<Room>>(_roomService.roomListObservable.stream, _onRoomList);
+    subscribe<List<Channel>>(_channelService.roomListObservable.stream, _onRoomList);
   }
 
   @override
@@ -192,7 +196,7 @@ class RoomModel extends WidgetModel {
     if (text.length == 0) return;
     shippingStageState.accept(true);
     bool isSuccess = true;
-    await _messageService.sendMessage(Room(roomName), text).catchError(
+    await _messageService.sendMessage(Channel(roomName), text).catchError(
       (error) {
         scaffoldKey.currentState.showSnackBar(
           SnackBar(
@@ -207,15 +211,16 @@ class RoomModel extends WidgetModel {
   }
 
   void _init() {
-    profileState.accept(_messageService.getProfile());
-    _roomService.getRoomHistory(Room(roomName)).catchError(
+    profileState.accept(_authService.getProfile());
+    _channelService.getRoomHistory(Channel(roomName)).catchError(
           // (error) => messageListState.error(error),
           (error) => print(error),
         );
   }
 
-  void _onRoomList(List<Room> list) {
-    final messageList = list.firstWhere((room) => room.name == roomName, orElse: () => null)?.messageList;
+  void _onRoomList(List<Channel> list) {
+    final messageList =
+        list.firstWhere((room) => room.name == roomName, orElse: () => null)?.messageList;
     messageList?.sort();
     messageListState.content(messageList ?? List<Message>());
     _scrollToEnd();

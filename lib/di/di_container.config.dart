@@ -10,14 +10,16 @@ import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../repository/auth_repository.dart';
+import '../service/auth_service.dart';
+import '../repository/channel_repository.dart';
+import '../service/channel_service.dart';
 import '../repository/lifecycle_repository.dart';
 import '../repository/message_repository.dart';
 import '../service/message_service.dart';
 import '../repository/preference_repository.dart';
 import '../repository/http_client.dart';
 import '../repository/ws_client.dart';
-import '../repository/room_repository.dart';
-import '../service/room_service.dart';
 import '../repository/preference_storage.dart';
 
 /// adds generated dependencies
@@ -36,20 +38,23 @@ Future<GetIt> $initGetIt(
   gh.factory<LifeCycleRepository>(() => LifeCycleRepository());
   gh.factoryParam<MessageRepository, String, dynamic>(
       (_userName, _) => MessageRepository(_userName));
-  gh.factory<RoomRepository>(() => RoomRepository(get<Dio>()));
   final resolvedSharedPreferences =
       await sharedPreferenceRegister.createSharedPref();
   gh.factory<SharedPreferences>(() => resolvedSharedPreferences);
   gh.factoryParam<WebSocketChannel, String, dynamic>(
       (userName, _) => registerWsClient.createWsClient(userName));
+  gh.factory<AuthRepository>(() => AuthRepository(get<Dio>()));
+  gh.factory<ChannelRepository>(() => ChannelRepository(get<Dio>()));
   gh.factory<PreferenceRepository>(
       () => PreferenceRepository(get<SharedPreferences>()));
 
   // Eager singletons must be registered in the right order
-  gh.singleton<RoomService>(RoomService(get<RoomRepository>()));
+  gh.singleton<ChannelService>(ChannelService(get<ChannelRepository>()));
+  gh.singleton<AuthService>(
+      AuthService(get<AuthRepository>(), get<PreferenceRepository>()));
   gh.singleton<MessageService>(MessageService(
     get<PreferenceRepository>(),
-    get<RoomService>(),
+    get<ChannelService>(),
     get<LifeCycleRepository>(),
   ));
   return get;
