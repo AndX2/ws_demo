@@ -1,27 +1,36 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:ws_demo/di/di_container.dart';
+import 'package:ws_demo/domain/profile.dart';
 import 'package:ws_demo/domain/room.dart';
 import 'package:ws_demo/domain/socket_message.dart';
+import 'package:ws_demo/repository/auth_interceptor.dart';
 import 'package:ws_demo/repository/request/message_request.dart';
 import 'package:ws_demo/repository/response/message_response.dart';
+
+/// Количество пропущенных heartbeat означающее разрыв соединения
+const _tolerance = 2;
+
+/// Периодичности heartbeat сообщений
+const _pingTimeout = Duration(seconds: 10);
 
 /// Репозиторий сообщений
 /// открытие ws канала происходит при создании инстанса репозитория
 /// [close()] закрывает канал
 @injectable
 class MessageRepository {
-  // ignore: unused_field
-  final String _userName;
-  final WebSocketChannel _channel;
+  MessageRepository(this._authInterceptor) : _channel = getIt.get<WebSocketChannel>();
 
-  MessageRepository(
-    @factoryParam this._userName,
-  ) : _channel = getIt.get<WebSocketChannel>(param1: _userName);
+  final WebSocketChannel _channel;
+  final AuthInterceptor _authInterceptor;
 
   /// Поток сообщений сервера
   Stream<SocketMessage> get stream {
     return _channel.stream.where((row) {
+      //"{"type":"closed","payload":"FormatException: Тип фрейма не распознан"}"
       if (row is String && row.length == 1) {
         print(row.codeUnits);
         if (row.codeUnits.first == 0xA) _onPong();
@@ -29,7 +38,9 @@ class MessageRepository {
         return false;
       }
       return true;
-    }).map<SocketMessage>((row) => SocketMessageResponse.fromJson(row).transform());
+    }).map<SocketMessage>((row) {
+      return SocketMessageResponse.fromJson(row).transform();
+    });
   }
 
   void _onPing() {
@@ -37,23 +48,21 @@ class MessageRepository {
   }
 
   void _onPong() {
-    print('pong');
+    // _channel.sink.add([0xA]);
   }
-
-  // if (ping is String) {
-  //     print(ping.length);
-  //     print(ping.codeUnits);
-  //   }
 
   /// Отправить сообщение
-  void send(Channel room, String text, String id) {
-    final messageRequest = MessageRequest(room, text, id);
-    final msg = messageRequest.toJson;
-    _channel.sink.add(msg);
+  Future<void> send(
+    Channel channel,
+    String body,
+    String id,
+  ) async {
+    final messageRequest = MessageRequest(channel, body, id);
+    final msg = await _authInterceptor.onSendMessage(messageRequest.toJson);
+    _channel.sink.add(jsonEncode(msg));
   }
 
-  void ping() {}
-  // void ping() => _channel.sink.add({"ping": true});
+  void ping() => _channel.sink.add([0x9]);
 
   /// Закрыть канал
   void close() {

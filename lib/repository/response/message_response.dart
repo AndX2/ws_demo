@@ -7,27 +7,23 @@ import 'package:ws_demo/util/transformable.dart';
 
 /// Ответ сервера [List<Message>]
 ///   ```json
-///   {
-///    "result": [
-///         {
-///             "room": "Тупичок",
-///             "created": "2021-01-28T17:50:52.656831273Z",
-///             "sender": {
-///                 "username": "ЙОЖ"
-///             },
-///             "text": "Ай, нане-нане! 111"
-///         }
-///     ]
-///   }
+///   [{
+///          "publicId": "baa45b67-b993-4f5c-b31b-276e4b894e46",
+///          "ownerId": "2d41c742-8436-4eb7-a458-4a2ab80fb7e6",
+///          "ownerName": "Spamer",
+///          "created": "2021-03-28T08:23:33.360432",
+///          "assets": [],
+///          "body":
+///              "Если вы хотите, чтобы код было легко и быстро писать — делайте его удобным для ///чтения.         Robert C. Martin"
+///        },
+///     ...]
 ///   ```
 ///
 class MessageListResponse extends Transformable<List<Message>> {
   List<Message> _list;
 
   MessageListResponse.fromJson(dynamic json) {
-    final List<dynamic> data = json['result'];
-
-    _list = data.map<Message>(
+    _list = json.map<Message>(
       (item) {
         return MessageResponse.fromJson(item).transform();
       },
@@ -42,13 +38,14 @@ class MessageListResponse extends Transformable<List<Message>> {
 /// Ответ сервера с объектом сообщения в канале
 ///   ```json
 ///   {
-///       "room": "Тупичок",
-///       "created": "2021-01-28T17:50:52.656831273Z",
-///       "sender": {
-///           "username": "ЙОЖ"
-///       },
-///       "text": "Ай, нане-нане! 111"
-///   }
+///          "publicId": "baa45b67-b993-4f5c-b31b-276e4b894e46",
+///          "ownerId": "2d41c742-8436-4eb7-a458-4a2ab80fb7e6",
+///          "ownerName": "Spamer",
+///          "created": "2021-03-28T08:23:33.360432",
+///          "assets": [],
+///          "body":
+///              "Если вы хотите, чтобы код было легко и быстро писать — делайте его удобным для ///чтения.         Robert C. Martin"
+///        }
 ///   ```
 ///
 class MessageResponse extends Transformable<Message> {
@@ -58,13 +55,12 @@ class MessageResponse extends Transformable<Message> {
 
   @override
   MessageResponse.fromJson(dynamic json) {
-    final msg = json['message'];
-    _created = DateTime.parse(msg['created']);
+    _created = DateTime.parse(json['created']);
     _owner = Owner(
-      msg['ownerId'],
-      msg['ownerName'],
+      json['ownerName'],
+      json['ownerId'],
     );
-    _body = msg['text'];
+    _body = json['body'];
   }
 
   @override
@@ -76,17 +72,23 @@ class MessageResponse extends Transformable<Message> {
 }
 
 /// Ответ сервера с объектом сообщения в канале
-///   ```json
-///   {
-///       "room": "Тупичок",
-///       "created": "2021-01-28T17:50:52.656831273Z",
-///       "sender": {
-///           "username": "ЙОЖ"
-///       },
-///       "text": "Ай, нане-нане! 111",
-///       "id": "123456789"
-///   }
-///   ```
+/// ```json
+/// {
+///      "channel": "quotes",
+///      "headers": {
+///        "access": "asdhfajhsdfjahsd",
+///      },
+///      "message": {
+///        "publicId": "7111b46f-6f0b-402c-b190-786f2917b89c",
+///        "ownerId": "2d41c742-8436-4eb7-a458-4a2ab80fb7e6",
+///        "ownerName": "Spamer",
+///        "created": "2021-03-29T23:25:53.360511",
+///        "assets": [],
+///        "body":
+///            "Всегда пишите код так, будто сопровождать его будет склонный к насилию психопат, ///который     знает, где вы живете. Martin Golding"
+///      }
+///    }
+/// ```
 ///
 class SocketMessageResponse extends Transformable<SocketMessage> {
   DateTime _created;
@@ -102,11 +104,11 @@ class SocketMessageResponse extends Transformable<SocketMessage> {
     _created = DateTime.parse(msg['created']);
     _owner = Owner(
       msg['ownerName'],
-      msg['ownerName'],
+      msg['ownerId'],
     );
     _body = msg['body'];
     _channel = json['channel'];
-    _id = msg['id'];
+    _id = msg['publicId'];
   }
 
   @override
@@ -120,16 +122,3 @@ class SocketMessageResponse extends Transformable<SocketMessage> {
     );
   }
 }
-
-final rowMsg = {
-  "channel": "quotes",
-  "message": {
-    "publicId": "7111b46f-6f0b-402c-b190-786f2917b89c",
-    "ownerId": "2d41c742-8436-4eb7-a458-4a2ab80fb7e6",
-    "ownerName": "Spamer",
-    "created": "2021-03-29T23:25:53.360511",
-    "assets": [],
-    "body":
-        "Всегда пишите код так, будто сопровождать его будет склонный к насилию психопат, который знает, где вы живете. Martin Golding"
-  }
-};

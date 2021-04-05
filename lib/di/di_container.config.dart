@@ -10,6 +10,7 @@ import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../repository/auth_interceptor.dart';
 import '../repository/auth_repository.dart';
 import '../service/auth_service.dart';
 import '../repository/channel_repository.dart';
@@ -34,10 +35,11 @@ Future<GetIt> $initGetIt(
   final registerDioClient = _$RegisterDioClient();
   final sharedPreferenceRegister = _$SharedPreferenceRegister();
   final registerWsClient = _$RegisterWsClient();
+  gh.factory<AuthInterceptor>(() => AuthInterceptor());
   gh.factory<Dio>(() => registerDioClient.createRoomClient());
   gh.factory<LifeCycleRepository>(() => LifeCycleRepository());
-  gh.factoryParam<MessageRepository, String, dynamic>(
-      (_userName, _) => MessageRepository(_userName));
+  gh.factory<MessageRepository>(
+      () => MessageRepository(get<AuthInterceptor>()));
   final resolvedSharedPreferences =
       await sharedPreferenceRegister.createSharedPref();
   gh.factory<SharedPreferences>(() => resolvedSharedPreferences);

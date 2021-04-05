@@ -20,7 +20,7 @@ const _shippingTimeoute = Duration(seconds: 10);
 class MessageService {
   MessageRepository _messageRepository;
   final PreferenceRepository _preferenceRepository;
-  final ChannelService _roomService;
+  final ChannelService _channelService;
   final LifeCycleRepository _lifeCycleRepository;
 
   // ignore: close_sinks
@@ -29,10 +29,9 @@ class MessageService {
 
   MessageService(
     this._preferenceRepository,
-    this._roomService,
+    this._channelService,
     this._lifeCycleRepository,
-  ) : _messageRepository =
-            getIt.get<MessageRepository>(param1: _preferenceRepository.profile.name) {
+  ) : _messageRepository = getIt.get<MessageRepository>() {
     _lifeCycleRepository.subscribe();
     _lifeCycleRepository.addListener(() => _lifeStateChanged(_lifeCycleRepository.state));
   }
@@ -46,10 +45,10 @@ class MessageService {
     );
   }
 
-  Future<void> sendMessage(Channel room, String text) async {
+  Future<void> sendMessage(Channel channel, String body) async {
     final id = _uuid.v4();
     final timeout = Timer(_shippingTimeoute, () => throw Exception());
-    _messageRepository.send(room, text, id);
+    _messageRepository.send(channel, body, id);
     await _shippingStreamController.stream.firstWhere((message) {
       timeout.cancel();
       return message.id == id;
@@ -58,22 +57,22 @@ class MessageService {
 
   void _onReceiveMessage(SocketMessage message) {
     _shippingStreamController.sink.add(message);
-    final roomList = _roomService.roomListObservable.value;
-    final targetRoom = roomList.firstWhere(
+    final channelList = _channelService.roomListObservable.value;
+    final targetRoom = channelList.firstWhere(
       (room) => room.name == message.channel,
       orElse: () => _addRoom(message),
     );
     if (!targetRoom.messageList.contains(message)) {
       targetRoom.messageList.add(message);
-      _roomService.roomListObservable.add(roomList);
+      _channelService.roomListObservable.add(channelList);
     }
   }
 
   Channel _addRoom(SocketMessage message) {
-    final roomList = _roomService.roomListObservable.value;
+    final roomList = _channelService.roomListObservable.value;
     final room = Channel(message.channel)..messageList.add(message);
     roomList.add(room);
-    _roomService.roomListObservable.add(roomList);
+    _channelService.roomListObservable.add(roomList);
     return room;
   }
 

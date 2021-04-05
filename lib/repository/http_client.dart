@@ -1,5 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
+import 'package:ws_demo/di/di_container.dart';
+import 'package:ws_demo/repository/auth_interceptor.dart';
+import 'package:ws_demo/service/auth_service.dart';
 import 'package:ws_demo/util/const.dart' as consts;
 
 /// DI фабрики различных HTTP клиентов
@@ -13,8 +16,9 @@ abstract class RegisterDioClient {
       sendTimeout: 10000,
     );
     return Dio(options)
-      ..interceptors.add(
+      ..interceptors.addAll([
+        AuthInterceptor(),
         LogInterceptor(requestBody: true, responseBody: true),
-      );
+      ]);
   }
 }

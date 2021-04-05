@@ -9,7 +9,7 @@ import 'package:ws_demo/ui/widget/route_not_found.dart';
 class Routes {
   /// Маршруты
   static const String main = '/';
-  static const String splash = '/splash';
+  static const String splash = 'splash';
   static const String room = 'room';
 
   /// Параметры

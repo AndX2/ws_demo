@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide RouterDelegate;
 import 'package:ws_demo/di/di_container.dart';
 import 'package:ws_demo/router.dart';
@@ -18,7 +19,7 @@ class App extends StatelessWidget {
     final routerDelegate = RouterDelegate();
     return MaterialApp(
       title: StringRes.appTitle,
-      initialRoute: Routes.splash,
+      initialRoute: kIsWeb ? Routes.main : Routes.splash,
       onGenerateRoute: routerDelegate.generateRootRoute,
     );
   }

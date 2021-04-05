@@ -22,8 +22,8 @@ class ChannelRepository {
   }
 
   /// Получить историю сообщений в канале
-  Future<List<Message>> fetchMessageList(Channel room) async {
-    return _httpClient.get(consts.Url.roomHistory(room)).then((response) {
+  Future<List<Message>> fetchMessageList(Channel channel) async {
+    return _httpClient.get(consts.Url.channelHistory(channel)).then((response) {
       return MessageListResponse.fromJson(response.data).transform();
     });
   }

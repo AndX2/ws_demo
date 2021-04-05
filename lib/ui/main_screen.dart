@@ -48,7 +48,7 @@ class _MainScreenWidgetState extends WidgetState<MainScreenModel> {
           key: wm.scaffoldKey,
           backgroundColor: Colors.transparent,
           body: EntityStateBuilder<List<Channel>>(
-            streamedState: wm.roomListState,
+            streamedState: wm.channelListState,
             loadingChild: Center(child: CircularProgressIndicator()),
             child: (ctx, list) => _buildRoomListView(ctx, list, context),
           ),
@@ -60,10 +60,35 @@ class _MainScreenWidgetState extends WidgetState<MainScreenModel> {
 
   Widget _buildFab(BuildContext context) {
     return StreamedStateBuilder<bool>(
+        streamedState: wm.isAuthorizedState,
+        builder: (context, isAuthorised) {
+          return isAuthorised ? _buildAddMsgFab() : _buildLoginFab(context);
+        });
+  }
+
+  Widget _buildLoginFab(BuildContext context) {
+    return Container(
+      constraints: BoxConstraints(
+        maxWidth: context.sw600 ? 48.0 : 72.0,
+        maxHeight: context.sw600 ? 48.0 : 72.0,
+      ),
+      child: SimpleCard(
+          onPressed: wm.loginAction,
+          padding: EdgeInsets.zero,
+          child: Icon(
+            Icons.login,
+            size: context.sw600 ? 36.0 : 48.0,
+            color: ColorRes.textBlue,
+          )),
+    );
+  }
+
+  Widget _buildAddMsgFab() {
+    return StreamedStateBuilder<bool>(
         streamedState: wm.addChannelShownState,
         builder: (context, addChannel) {
           return EntityStateBuilder<List<Channel>>(
-            streamedState: wm.roomListState,
+            streamedState: wm.channelListState,
             loadingChild: Container(),
             child: (_, __) => Container(
               constraints: BoxConstraints(
@@ -71,9 +96,7 @@ class _MainScreenWidgetState extends WidgetState<MainScreenModel> {
                 maxHeight: context.sw600 ? 48.0 : 72.0,
               ),
               child: SimpleCard(
-                  onPressed: () {
-                    wm.addMessageAction();
-                  },
+                  onPressed: wm.addMessageAction,
                   padding: EdgeInsets.zero,
                   child: Icon(
                     addChannel ? Icons.add : Icons.edit_outlined,
@@ -201,19 +224,24 @@ class MainScreenModel extends WidgetModel {
   final bsFormKey = GlobalKey<FormState>();
 
   final scrollController = ScrollController();
-  final roomListState = EntityStreamedState<List<Channel>>()..loading();
+  final bsTextFieldController = TextEditingController();
+
+  final loginAction = Action<void>();
   final addMessageAction = Action<void>();
-  final addChannelShownState = StreamedState<bool>(false);
   final onBackAction = Action<void>();
   final onRoomSelectedAction = Action<Channel>();
   final bsNameInputAction = Action<void>();
   final bsAddRoomAction = Action<void>();
-  final bsTextFieldController = TextEditingController();
+
+  final channelListState = EntityStreamedState<List<Channel>>()..loading();
+  final isAuthorizedState = StreamedState<bool>(false);
+  final addChannelShownState = StreamedState<bool>(false);
 
   @override
   void onLoad() {
     super.onLoad();
-    _init();
+    _authService.addListener(_authListener);
+    _authListener();
     subscribe<List<Channel>>(_channelService.roomListObservable.stream, _onChannelList);
     _messageService.subscribe();
   }
@@ -221,6 +249,7 @@ class MainScreenModel extends WidgetModel {
   @override
   void onBind() {
     super.onBind();
+    subscribe<void>(loginAction.stream, (_) => _createProfile());
     subscribe<void>(onBackAction.stream, (_) => addChannelShownState.accept(false));
     subscribe<void>(addMessageAction.stream, _onAddMessageAction);
     subscribe<void>(bsNameInputAction.stream, _onBsNameAction);
@@ -228,31 +257,31 @@ class MainScreenModel extends WidgetModel {
     subscribe<Channel>(onRoomSelectedAction.stream, _onRoomSelected);
   }
 
-  bool _isAutorized() {
-    final profile = _authService.getProfile();
-    if (profile.isEmpty) {
-      bsTextFieldController.text = '';
-      _createProfile();
-      return false;
-    } else
-      return true;
+  @override
+  void dispose() {
+    _authService.removeListener(_authListener);
+    super.dispose();
+  }
+
+  void _authListener() {
+    final isAuth = _authService.isAuthorized;
+    if (isAuth != isAuthorizedState.value) isAuthorizedState.accept(isAuth);
+    if (isAuth) _channelService.getChannelList();
   }
 
   void _onRoomSelected(Channel room) async {
-    if (!_isAutorized()) return;
     _rootNavigator.pushNamed(Routes.room, arguments: {Routes.roomName: room.name});
   }
 
-  void _onBsNameAction(_) {
+  void _onBsNameAction(_) async {
     if (bsFormKey.currentState.validate()) {
       final name = bsTextFieldController.text;
-      _authService.setProfile(Profile(null, name));
+      await _authService.login(name);
       Navigator.of(scaffoldKey.currentContext).pop();
     }
   }
 
   void _onAddMessageAction(_) async {
-    if (!_isAutorized()) return;
     if (!addChannelShownState.value) {
       addChannelShownState.accept(true);
       return;
@@ -293,13 +322,9 @@ class MainScreenModel extends WidgetModel {
     );
   }
 
-  void _init() async {
-    _channelService.getChannelList().catchError((error) => roomListState.error(error));
-  }
-
   void _onChannelList(List<Channel> list) {
     final sortedList = List<Channel>.from(list)..sort();
 
-    roomListState.content(sortedList.reversed.toList());
+    channelListState.content(sortedList.reversed.toList());
   }
 }

@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mwwm/mwwm.dart';
+import 'package:ws_demo/di/di_container.dart';
+import 'package:ws_demo/router.dart';
+import 'package:ws_demo/service/auth_service.dart';
 
 import 'package:ws_demo/ui/widget/screen_back.dart';
 import 'package:ws_demo/util/const.dart';
@@ -52,22 +55,21 @@ class _SplashScreenWidgetState extends WidgetState<SplashScreenModel> {
 
 /// [SplashScreenModel] для [SplashScreen]
 class SplashScreenModel extends WidgetModel {
-  final NavigatorState _rootNavigator;
-
   SplashScreenModel(
     WidgetModelDependencies baseDependencies,
     this._rootNavigator,
-  ) : super(baseDependencies);
+  )   : _authService = getIt<AuthService>(),
+        super(baseDependencies);
+
+  final AuthService _authService;
+  final NavigatorState _rootNavigator;
 
   @override
   void onLoad() {
     super.onLoad();
-    Timer(
-      _splashDelay,
-      () {
-        _rootNavigator.pop();
-      },
-    );
+    Future.wait([_authService.tryReauth(), Future.delayed(_splashDelay)])
+        .timeout(_splashDelay)
+        .whenComplete(() => _rootNavigator.pushReplacementNamed(Routes.main));
   }
 
   @override

@@ -19,6 +19,7 @@ class Profile {
   bool get isEmpty => id == null || id.isEmpty;
 
   factory Profile.fromJson(dynamic json) {
+    if (json == null) return null;
     return Profile(
       jsonDecode(json ?? '{}')["id"],
       jsonDecode(json ?? '{}')["name"],

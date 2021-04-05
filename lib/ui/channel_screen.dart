@@ -156,7 +156,7 @@ class _RoomWidgetState extends WidgetState<RoomModel> {
 class RoomModel extends WidgetModel {
   RoomModel(
     WidgetModelDependencies dependencies,
-    this.roomName,
+    this.channelName,
     this._rootNavigator,
   )   : _channelService = getIt.get<ChannelService>(),
         _messageService = getIt.get<MessageService>(),
@@ -164,7 +164,7 @@ class RoomModel extends WidgetModel {
         super(dependencies);
 
   /// пришедшие данные извне
-  final String roomName;
+  final String channelName;
   final NavigatorState _rootNavigator;
   final ChannelService _channelService;
   final MessageService _messageService;
@@ -196,7 +196,7 @@ class RoomModel extends WidgetModel {
     if (text.length == 0) return;
     shippingStageState.accept(true);
     bool isSuccess = true;
-    await _messageService.sendMessage(Channel(roomName), text).catchError(
+    await _messageService.sendMessage(Channel(channelName), text).catchError(
       (error) {
         scaffoldKey.currentState.showSnackBar(
           SnackBar(
@@ -212,15 +212,14 @@ class RoomModel extends WidgetModel {
 
   void _init() {
     profileState.accept(_authService.getProfile());
-    _channelService.getRoomHistory(Channel(roomName)).catchError(
-          // (error) => messageListState.error(error),
+    _channelService.getRoomHistory(Channel(channelName)).catchError(
           (error) => print(error),
         );
   }
 
   void _onRoomList(List<Channel> list) {
     final messageList =
-        list.firstWhere((room) => room.name == roomName, orElse: () => null)?.messageList;
+        list.firstWhere((room) => room.name == channelName, orElse: () => null)?.messageList;
     messageList?.sort();
     messageListState.content(messageList ?? List<Message>());
     _scrollToEnd();

@@ -31,7 +31,7 @@ class AuthRepository {
   Future<TokenPair> refresh(String refreshToken) {
     return _client
         .post(
-      Url.signUp,
+      Url.refresh,
       options: Options(headers: {'authorization': refreshToken}),
     )
         .then((response) {

@@ -23,21 +23,34 @@ class AuthService extends ChangeNotifier {
   Profile profile;
   DateTime expiresAt;
 
-  Future<void> login(String name) async {
-    Profile profile = await _authRepository.signIn(name).catchError((_) {});
-    if (profile == null) profile = await _authRepository.signUp(name);
+  bool get isAuthorized => tokenPair != null;
+  bool get accessIsExpired => expiresAt == null || expiresAt.isBefore(DateTime.now());
 
-    tokenPair = profile.tokenPair;
-    profile = profile;
+  Future<void> login(String name) async {
+    Profile newProfile = await _authRepository.signIn(name).catchError((_) {});
+    newProfile ??= await _authRepository.signUp(name);
+
+    tokenPair = newProfile.tokenPair;
+    profile = newProfile;
+    expiresAt = DateTime.now().add(_accessLifeTime);
+    setProfile(profile);
+    notifyListeners();
+  }
+
+  Future<void> refreshToken({String refresh}) async {
+    final token = await _authRepository.refresh(refresh ?? tokenPair.refresh);
+
+    profile = getProfile();
+    setProfile(profile.copyWith(tokenPair: token));
+    tokenPair = token;
     expiresAt = DateTime.now().add(_accessLifeTime);
   }
 
-  Future<void> refreshToken() async {
-    final newTokenPair = await _authRepository.refresh(tokenPair.refresh);
-
-    tokenPair = newTokenPair;
-    profile = profile.copyWith(tokenPair: tokenPair);
-    expiresAt = DateTime.now().add(_accessLifeTime);
+  Future<void> tryReauth() async {
+    final profile = getProfile();
+    if (profile != null) {
+      await refreshToken(refresh: profile.tokenPair.refresh).catchError((_) => login(profile.name));
+    }
   }
 
   Profile getProfile() {

@@ -6,27 +6,25 @@ import 'package:ws_demo/util/transformable.dart';
 /// Ответ сервера [List<Room>]
 ///   ```json
 ///      {
-///       "result": [
-///           {
-///               "name": "Тупичок",
-///               "last_message": {
-///                   "room": "Тупичок",
-///                   "created": "2021-01-28T17:50:52.656831273Z",
-///                   "sender": {
-///                       "username": "ЙОЖ"
-///                   },
-///                   "text": "Ай, нане-нане! 111"
-///               }
-///           }
-///        ]
-///      }
+///            "quotes": {
+///                "publicId": "30d959c4-b89b-4632-a282-9bdb92fbed65",
+///                "ownerId": "2d41c742-8436-4eb7-a458-4a2ab80fb7e6",
+///                "ownerName": "Spamer",
+///                "created": "2021-04-04T00:26:33.360504",
+///                "assets": [],
+///                "body": "Проблема С++ в том, что необходимо узнать всё о нём перед тем, как начать писать           на нём все что угодно. Larry Wall"
+///            },
+///            "channel1": {
+///                ...
+///            }
+///        }
 ///   ```
 class ChannelListResponse extends Transformable<List<Channel>> {
   var _roomList = List<Channel>();
 
   ChannelListResponse.fromJson(dynamic json) {
-    final List<dynamic> data = json['result'];
-    _roomList.addAll(data.map<Channel>((item) => RoomResponse.fromJson(item).transform()));
+    _roomList.addAll(
+        (json as Map).entries.map<Channel>((item) => ChannelResponse.fromJson(item).transform()));
   }
 
   @override
@@ -34,27 +32,14 @@ class ChannelListResponse extends Transformable<List<Channel>> {
 }
 
 /// Ответ сервера [Channel]
-///   ```json
-///        {
-///            "name": "Тупичок",
-///            "last_message": {
-///                "room": "Тупичок",
-///                "created": "2021-01-28T17:50:52.656831273Z",
-///                "sender": {
-///                    "username": "ЙОЖ"
-///                },
-///                "text": "Ай, нане-нане! 111"
-///            }
-///        }
-///   ```
-class RoomResponse extends Transformable<Channel> {
+class ChannelResponse extends Transformable<Channel> {
   String _name;
   Message _lastMessage;
 
   @override
-  RoomResponse.fromJson(dynamic json) {
-    _name = json['name'];
-    _lastMessage = MessageResponse.fromJson(json['last_message']).transform();
+  ChannelResponse.fromJson(MapEntry<String, dynamic> entry) {
+    _name = entry.key;
+    _lastMessage = MessageResponse.fromJson(entry.value).transform();
   }
 
   @override

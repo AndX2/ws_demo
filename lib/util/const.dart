@@ -28,14 +28,14 @@ const Map<String, String> _pathSegmentReplacement = {
 
 /// Статические URL используемые приложением (динамические в [RemoteConfigFactory])
 class Url {
-  static const String httpBaseUrl = 'https://dartservice.ru/messenger';
+  static const String httpBaseUrl = 'https://dartservice.ru';
   static const String wsBaseUrl = 'wss://dartservice.ru/messenger/ws';
 
   /// История последних сообщений в канале
-  static String roomHistory(Channel room) => '/api/rooms/${cleanUrlPathSegment(room.name)}/history';
+  static String channelHistory(Channel channel) => '/messenger/channel/${channel.name}';
 
   /// Список всех каналов
-  static const String roomList = '/channel';
+  static const String roomList = '/messenger/channel';
 
   /// WS канал сообщений
   static const String messageChannel = wsBaseUrl;
