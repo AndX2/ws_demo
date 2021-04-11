@@ -15,7 +15,10 @@ class PreferenceRepository {
   PreferenceRepository(this._preferences);
 
   /// Сохранить профиль пользователя
-  Future<bool> saveProfile(Profile profile) => _preferences.setString(_profileKey, jsonEncode(profile.toJson));
+  Future<bool> saveProfile(Profile profile) => _preferences.setString(
+        _profileKey,
+        jsonEncode(profile.toJson),
+      );
 
   /// Получить профиль пользователя
   Profile get profile => Profile.fromJson(_preferences.getString(_profileKey));

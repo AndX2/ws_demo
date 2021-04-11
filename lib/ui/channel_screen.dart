@@ -182,7 +182,7 @@ class RoomModel extends WidgetModel {
   void onLoad() {
     super.onLoad();
     _init();
-    subscribe<List<Channel>>(_channelService.roomListObservable.stream, _onRoomList);
+    subscribe<List<Channel>>(_channelService.channelListObservable.stream, _onRoomList);
   }
 
   @override
@@ -212,7 +212,7 @@ class RoomModel extends WidgetModel {
 
   void _init() {
     profileState.accept(_authService.getProfile());
-    _channelService.getRoomHistory(Channel(channelName)).catchError(
+    _channelService.getChannelHistory(Channel(channelName)).catchError(
           (error) => print(error),
         );
   }

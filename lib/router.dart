@@ -10,10 +10,10 @@ class Routes {
   /// Маршруты
   static const String main = '/';
   static const String splash = 'splash';
-  static const String room = 'room';
+  static const String channel = 'channel';
 
   /// Параметры
-  static const String roomName = 'roomName';
+  static const String channelName = 'channelName';
 }
 
 /// Делегат [MaterialApp] для управления навигацией
@@ -31,9 +31,9 @@ class RouterDelegate {
       case Routes.main:
         return CupertinoPageRoute(builder: (context) => MainScreenWidget());
         break;
-      case Routes.room:
+      case Routes.channel:
         return CupertinoPageRoute(
-            builder: (context) => ChannelScreenWidget(roomName: params[Routes.roomName]));
+            builder: (context) => ChannelScreenWidget(roomName: params[Routes.channelName]));
         break;
       default:
         return CupertinoPageRoute(builder: (context) => RouteNotFoundWidget(settings: settings));

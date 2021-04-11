@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
+/// Репозиторий состояния жижненного цикла приложения
 @injectable
 class LifeCycleRepository with WidgetsBindingObserver, ChangeNotifier {
   AppLifecycleState _appState;
 
   AppLifecycleState get state => _appState;
+
   void subscribe() {
     WidgetsBinding.instance.addObserver(this);
   }

@@ -243,7 +243,7 @@ class MainScreenModel extends WidgetModel {
     super.onLoad();
     _authService.addListener(_authListener);
     _authListener();
-    subscribe<List<Channel>>(_channelService.roomListObservable.stream, _onChannelList);
+    subscribe<List<Channel>>(_channelService.channelListObservable.stream, _onChannelList);
     _messageService.subscribe();
   }
 
@@ -275,7 +275,7 @@ class MainScreenModel extends WidgetModel {
       loginAction();
       return;
     }
-    _rootNavigator.pushNamed(Routes.room, arguments: {Routes.roomName: room.name});
+    _rootNavigator.pushNamed(Routes.channel, arguments: {Routes.channelName: room.name});
   }
 
   void _onBsNameAction(_) async {
@@ -299,7 +299,7 @@ class MainScreenModel extends WidgetModel {
       final roomName = bsTextFieldController.text;
       bsTextFieldController.clear();
       Navigator.of(scaffoldKey.currentContext).pop();
-      _rootNavigator.pushNamed(Routes.room, arguments: {Routes.roomName: roomName});
+      _rootNavigator.pushNamed(Routes.channel, arguments: {Routes.channelName: roomName});
     }
   }
 

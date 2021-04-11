@@ -8,32 +8,34 @@ import 'package:ws_demo/repository/channel_repository.dart';
 /// Сервис для операция с данными о каналах
 @singleton
 class ChannelService {
-  final ChannelRepository _roomRepository;
+  final ChannelRepository _channelRepository;
 
   // ignore: close_sinks
-  final roomListObservable = BehaviorSubject<List<Channel>>.seeded([]);
+  final channelListObservable = BehaviorSubject<List<Channel>>.seeded([]);
 
-  ChannelService(this._roomRepository);
+  ChannelService(this._channelRepository);
 
+  /// Получить список каналов
   Future<void> getChannelList() async {
-    final roomList = await _roomRepository.fetchRoomList();
-    if (roomList != null && roomList.isNotEmpty) roomListObservable.add(roomList);
+    final channelList = await _channelRepository.fetchRoomList();
+    if (channelList != null && channelList.isNotEmpty) channelListObservable.add(channelList);
   }
 
-  Future<void> getRoomHistory(Channel room) async {
-    final roomHistory = await _roomRepository.fetchMessageList(room);
-    if (roomHistory != null) _setRoomHistory(room, roomHistory);
+  /// Получить историю сообщений в канале
+  Future<void> getChannelHistory(Channel channel) async {
+    final roomHistory = await _channelRepository.fetchMessageList(channel);
+    if (roomHistory != null) _setChannelHistory(channel, roomHistory);
   }
 
-  void _setRoomHistory(Channel room, List<Message> list) {
-    final currentRoom =
-        roomListObservable.value.firstWhere((item) => item == room, orElse: () => null);
-    if (currentRoom != null) {
-      currentRoom.messageList.clear();
-      currentRoom.messageList.addAll(list);
+  void _setChannelHistory(Channel room, List<Message> list) {
+    final currentChannel =
+        channelListObservable.value.firstWhere((item) => item == room, orElse: () => null);
+    if (currentChannel != null) {
+      currentChannel.messageList.clear();
+      currentChannel.messageList.addAll(list);
     } else {
-      roomListObservable.value.add(room);
+      channelListObservable.value.add(room);
     }
-    roomListObservable.add(roomListObservable.value);
+    channelListObservable.add(channelListObservable.value);
   }
 }

@@ -6,7 +6,7 @@ import 'package:ws_demo/repository/ws_conditional_import.dart/facade.dart'
     if (dart.library.html) 'package:ws_demo/repository/ws_conditional_import.dart/web_impl.dart'
     if (dart.library.io) 'package:ws_demo/repository/ws_conditional_import.dart/io_impl.dart';
 
-/// DI фабрики различных Ws клиентов
+/// DI модуль Ws клиентов
 @module
 abstract class RegisterWsClient {
   /// Клиент доступа к сообщениям

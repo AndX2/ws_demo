@@ -5,6 +5,7 @@ import 'package:ws_demo/domain/token_pair.dart';
 import 'package:ws_demo/repository/response/profile_response.dart';
 import 'package:ws_demo/util/const.dart';
 
+/// Репозиторий аутентификации
 @injectable
 class AuthRepository {
   AuthRepository(this._client);

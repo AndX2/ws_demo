@@ -65,7 +65,7 @@ class MessageService {
 
   void _onReceiveMessage(SocketMessage message) {
     _shippingStreamController.sink.add(message);
-    final channelList = _channelService.roomListObservable.value;
+    final channelList = _channelService.channelListObservable.value;
     final targetRoom = channelList.firstWhere(
       (room) => room.name == message.channel,
       orElse: () => _addChannel(message),
@@ -73,7 +73,7 @@ class MessageService {
     if (!targetRoom.messageList.contains(message)) {
       if (_debounceTimer == null || !_debounceTimer.isActive) {
         targetRoom.messageList.add(message);
-        _channelService.roomListObservable.add(channelList);
+        _channelService.channelListObservable.add(channelList);
         _debounceTimer = Timer(_debounceTimeout, _applyDebouncedMessages);
       } else {
         _debouncedMessagesCache.add(message);
@@ -82,22 +82,22 @@ class MessageService {
   }
 
   Channel _addChannel(SocketMessage message) {
-    final roomList = _channelService.roomListObservable.value;
+    final roomList = _channelService.channelListObservable.value;
     final room = Channel(message.channel)..messageList.add(message);
     roomList.add(room);
-    _channelService.roomListObservable.add(roomList);
+    _channelService.channelListObservable.add(roomList);
     return room;
   }
 
   void _applyDebouncedMessages() {
     if (_debouncedMessagesCache.isEmpty) return;
 
-    final channelList = _channelService.roomListObservable.value;
+    final channelList = _channelService.channelListObservable.value;
     _debouncedMessagesCache.forEach((message) {
       final targetRoom = channelList.firstWhere((room) => room.name == message.channel);
       targetRoom.messageList.add(message);
     });
-    _channelService.roomListObservable.add(channelList);
+    _channelService.channelListObservable.add(channelList);
     _debouncedMessagesCache.clear();
     _debounceTimer = Timer(_debounceTimeout, _applyDebouncedMessages);
   }
