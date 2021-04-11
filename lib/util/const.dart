@@ -1,4 +1,4 @@
-import 'package:ws_demo/domain/room.dart';
+import 'package:ws_demo/domain/channel.dart';
 
 /// Паттерны экранирования символов в URL (для имени пользователя)
 const Map<String, String> _pathSegmentReplacement = {

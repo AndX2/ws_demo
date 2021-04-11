@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:ws_demo/domain/profile.dart';
 
-import 'package:ws_demo/domain/room.dart';
+import 'package:ws_demo/domain/channel.dart';
 
 /// Объект сообщения пользователя для ws канала
 /// ```json
@@ -37,12 +36,10 @@ class MessageRequest {
         "type": "message",
         "headers": {
           "channel": channel.name,
-          "access":
-              "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL2RhcnRzZXJ2aWNlLnJ1L2F1dGgiLCJleHAiOjE2MTY0ODU3MjMsImRhdGEiOnsidXNlciI6bnVsbCwidXNlck5hbWUiOm51bGx9fQ.FdnVc_Clqh4k3DwHNcg0VYUpZL6sDD44EIsf0QRnBPHtZs7JMJFEjLo8a64sqK47_sxu4hNjaEPohQJSeq9vWqPiCZWFvMCAeCFGPHYc4pStNLztIpjGFjCZSIqscwobqq5nyRCOAxFZS87cmaB2mNkHNBVySlF0MArHC5jNOygZMPZrWfl-qCZVLEGdWD8Cy-_Y2p7uCuuuShsC1iEXaJdu8iuHKMaSX2KFVlXUGMci8P3YpmC3N2BveYgB93593qrGD1mNLB3uez-Eq203oorGd3-3nxXL83th465qdQB25tjvvg__Uzbgzvp5HVKRHa4d0HMNrVr09ejVEmBJ0A"
         },
         "payload": {
           "publicId": id,
-          "created": DateTime.now().toIso8601String(),
+          "created": DateTime.now().toUtc().toIso8601String(),
           "assets": [],
           "body": body
         }

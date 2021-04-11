@@ -66,7 +66,6 @@ class MessageResponse extends Transformable<Message> {
   @override
   Message transform() {
     final message = Message(_created, _owner, _body);
-    // print(message.toJson());
     return message;
   }
 }

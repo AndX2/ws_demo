@@ -2,7 +2,7 @@ import 'package:injectable/injectable.dart';
 import 'package:rxdart/subjects.dart';
 
 import 'package:ws_demo/domain/message.dart';
-import 'package:ws_demo/domain/room.dart';
+import 'package:ws_demo/domain/channel.dart';
 import 'package:ws_demo/repository/channel_repository.dart';
 
 /// Сервис для операция с данными о каналах

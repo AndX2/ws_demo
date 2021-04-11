@@ -2,9 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:ws_demo/domain/message.dart';
 
-/// Комната (канал) для отправки сообщений
-/// Room.name используется в качестве сегмента Url path
-/// необходима проверка валидности
+/// Канал в который адресованы сообщение
 @immutable
 class Channel extends Comparable {
   final String name;
@@ -22,7 +20,8 @@ class Channel extends Comparable {
 
   @override
   int compareTo(dynamic other) {
-    if (!(other is Channel)) throw FormatException('Room.compareTo(other) => other is\'nt Room');
+    if (!(other is Channel))
+      throw FormatException('Channel.compareTo(other) => other is\'nt Channel');
     return this.lastMessage.compareTo(other.lastMessage);
   }
 

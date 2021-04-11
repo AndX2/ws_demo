@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:ws_demo/domain/message.dart';
 import 'package:ws_demo/util/style.dart';
@@ -10,6 +12,7 @@ const _strokeWidth = 1.0;
 const _paddingMain = EdgeInsets.only(left: 96.0, top: 16.0);
 const _paddingOther = EdgeInsets.only(right: 96.0, top: 16.0);
 
+/// Виджет ссобщения в чате
 class ChatMessageWidget extends StatelessWidget {
   final Message message;
   final ChatMessageOwner owner;
@@ -46,11 +49,22 @@ class ChatMessageWidget extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Text(
-              message.body,
-              style: context.sp(owner == ChatMessageOwner.mine
-                  ? StyleRes.content24Blue
-                  : StyleRes.content24Yellow),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (owner != ChatMessageOwner.mine)
+                  Text(
+                    '${message.owner.ownerName}:',
+                    style: context.sp(
+                        StyleRes.content24Yellow.copyWith(decoration: TextDecoration.underline)),
+                  ),
+                SelectableText(
+                  message.body,
+                  style: context.sp(owner == ChatMessageOwner.mine
+                      ? StyleRes.content24Blue
+                      : StyleRes.content24Yellow),
+                ),
+              ],
             ),
           ),
         ],

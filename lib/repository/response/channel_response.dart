@@ -1,9 +1,9 @@
 import 'package:ws_demo/domain/message.dart';
-import 'package:ws_demo/domain/room.dart';
+import 'package:ws_demo/domain/channel.dart';
 import 'package:ws_demo/repository/response/message_response.dart';
 import 'package:ws_demo/util/transformable.dart';
 
-/// Ответ сервера [List<Room>]
+/// Ответ сервера [List<Channel>]
 ///   ```json
 ///      {
 ///            "quotes": {

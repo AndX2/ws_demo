@@ -38,22 +38,18 @@ Future<GetIt> $initGetIt(
   gh.factory<AuthInterceptor>(() => AuthInterceptor());
   gh.factory<Dio>(() => registerDioClient.createRoomClient());
   gh.factory<LifeCycleRepository>(() => LifeCycleRepository());
-  gh.factory<MessageRepository>(
-      () => MessageRepository(get<AuthInterceptor>()));
-  final resolvedSharedPreferences =
-      await sharedPreferenceRegister.createSharedPref();
+  gh.factory<MessageRepository>(() => MessageRepository(get<AuthInterceptor>()));
+  final resolvedSharedPreferences = await sharedPreferenceRegister.createSharedPref();
   gh.factory<SharedPreferences>(() => resolvedSharedPreferences);
   gh.factoryParam<WebSocketChannel, String, dynamic>(
-      (userName, _) => registerWsClient.createWsClient(userName));
+      (userName, _) => registerWsClient.createWsClient());
   gh.factory<AuthRepository>(() => AuthRepository(get<Dio>()));
   gh.factory<ChannelRepository>(() => ChannelRepository(get<Dio>()));
-  gh.factory<PreferenceRepository>(
-      () => PreferenceRepository(get<SharedPreferences>()));
+  gh.factory<PreferenceRepository>(() => PreferenceRepository(get<SharedPreferences>()));
 
   // Eager singletons must be registered in the right order
   gh.singleton<ChannelService>(ChannelService(get<ChannelRepository>()));
-  gh.singleton<AuthService>(
-      AuthService(get<AuthRepository>(), get<PreferenceRepository>()));
+  gh.singleton<AuthService>(AuthService(get<AuthRepository>(), get<PreferenceRepository>()));
   gh.singleton<MessageService>(MessageService(
     get<PreferenceRepository>(),
     get<ChannelService>(),

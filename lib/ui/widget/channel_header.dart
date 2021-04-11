@@ -1,14 +1,18 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'package:ws_demo/ui/widget/screen_back.dart';
 import 'package:ws_demo/util/style.dart';
+import 'package:ws_demo/util/ui_util.dart';
 
 const _side = 8.0;
 const _strokeWidth = 1.0;
 
-class RoomHeaderWidget extends StatelessWidget {
+class ChannelHeaderWidget extends StatelessWidget {
   final Widget child;
 
-  const RoomHeaderWidget({Key key, @required this.child}) : super(key: key);
+  const ChannelHeaderWidget({Key key, @required this.child}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +32,25 @@ class RoomHeaderWidget extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: EdgeInsets.fromLTRB(16.0, MediaQuery.of(context).padding.top + 8.0, 16.0, 16.0),
-          child: SizedBox(width: double.infinity, child: child),
+          padding: EdgeInsets.fromLTRB(8.0, MediaQuery.of(context).padding.top, 16.0, 8.0),
+          child: SizedBox(
+              width: double.infinity,
+              child: Row(
+                children: [
+                  if (kIsWeb)
+                    CupertinoButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Icon(
+                        Icons.arrow_back_ios,
+                        size: context.sw600 ? 24.0 : 32.0,
+                        color: ColorRes.textRed,
+                      ),
+                    ),
+                  if (!kIsWeb) SizedBox(width: 8.0),
+                  SizedBox(height: 56.0),
+                  Expanded(child: child),
+                ],
+              )),
         ),
       ],
     );
@@ -60,7 +81,7 @@ class RoomHeaderWidget extends StatelessWidget {
 
 class _RoomHeaderClipper extends CustomClipper<Path> {
   @override
-  Path getClip(Size size) => RoomHeaderWidget.getPath(size);
+  Path getClip(Size size) => ChannelHeaderWidget.getPath(size);
 
   @override
   bool shouldReclip(_RoomHeaderClipper oldClipper) => false;
@@ -73,7 +94,7 @@ class _RoomHeaderPainter extends CustomPainter {
       ..color = ColorRes.textRed
       ..strokeWidth = _strokeWidth
       ..style = PaintingStyle.stroke;
-    final path = RoomHeaderWidget.getPathPainter(size);
+    final path = ChannelHeaderWidget.getPathPainter(size);
     canvas.drawPath(path, paint);
   }
 

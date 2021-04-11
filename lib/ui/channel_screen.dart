@@ -5,12 +5,12 @@ import 'package:relation/relation.dart';
 import 'package:ws_demo/di/di_container.dart';
 import 'package:ws_demo/domain/message.dart';
 import 'package:ws_demo/domain/profile.dart';
-import 'package:ws_demo/domain/room.dart';
+import 'package:ws_demo/domain/channel.dart';
 import 'package:ws_demo/service/auth_service.dart';
 import 'package:ws_demo/service/channel_service.dart';
 import 'package:ws_demo/service/message_service.dart';
+import 'package:ws_demo/ui/widget/channel_header.dart';
 import 'package:ws_demo/ui/widget/chat_message.dart';
-import 'package:ws_demo/ui/widget/room_header.dart';
 import 'package:ws_demo/ui/widget/screen_back.dart';
 import 'package:ws_demo/util/style.dart';
 import 'package:ws_demo/util/ui_util.dart';
@@ -74,7 +74,7 @@ class _RoomWidgetState extends WidgetState<RoomModel> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return RoomHeaderWidget(
+    return ChannelHeaderWidget(
       child: Text(
         roomName,
         maxLines: 2,

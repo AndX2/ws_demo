@@ -4,7 +4,7 @@ import 'package:relation/relation.dart';
 
 import 'package:ws_demo/di/di_container.dart';
 import 'package:ws_demo/domain/profile.dart';
-import 'package:ws_demo/domain/room.dart';
+import 'package:ws_demo/domain/channel.dart';
 import 'package:ws_demo/router.dart';
 import 'package:ws_demo/service/auth_service.dart';
 import 'package:ws_demo/service/channel_service.dart';
@@ -50,7 +50,7 @@ class _MainScreenWidgetState extends WidgetState<MainScreenModel> {
           body: EntityStateBuilder<List<Channel>>(
             streamedState: wm.channelListState,
             loadingChild: Center(child: CircularProgressIndicator()),
-            child: (ctx, list) => _buildRoomListView(ctx, list, context),
+            child: (ctx, list) => _buildChannelListView(ctx, list, context),
           ),
           floatingActionButton: _buildFab(context),
         ),
@@ -108,9 +108,10 @@ class _MainScreenWidgetState extends WidgetState<MainScreenModel> {
         });
   }
 
-  Widget _buildRoomListView(BuildContext ctx, List<Channel> list, BuildContext context) {
+  Widget _buildChannelListView(BuildContext ctx, List<Channel> list, BuildContext context) {
     return Column(
       children: [
+        SizedBox(height: 24.0),
         StreamedStateBuilder<bool>(
           streamedState: wm.addChannelShownState,
           builder: (_, isShow) {
@@ -270,6 +271,10 @@ class MainScreenModel extends WidgetModel {
   }
 
   void _onRoomSelected(Channel room) async {
+    if (!_authService.isAuthorized) {
+      loginAction();
+      return;
+    }
     _rootNavigator.pushNamed(Routes.room, arguments: {Routes.roomName: room.name});
   }
 

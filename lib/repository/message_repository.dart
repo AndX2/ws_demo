@@ -1,11 +1,9 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:ws_demo/di/di_container.dart';
-import 'package:ws_demo/domain/profile.dart';
-import 'package:ws_demo/domain/room.dart';
+import 'package:ws_demo/domain/channel.dart';
 import 'package:ws_demo/domain/socket_message.dart';
 import 'package:ws_demo/repository/auth_interceptor.dart';
 import 'package:ws_demo/repository/request/message_request.dart';
@@ -30,11 +28,10 @@ class MessageRepository {
   /// Поток сообщений сервера
   Stream<SocketMessage> get stream {
     return _channel.stream.where((row) {
-      //"{"type":"closed","payload":"FormatException: Тип фрейма не распознан"}"
-      if (row is String && row.length == 1) {
-        print(row.codeUnits);
-        if (row.codeUnits.first == 0xA) _onPong();
-        if (row.codeUnits.first == 0x9) _onPing();
+      print(row);
+      if (row is List<int> && row.length == 1) {
+        if (row.first == 0xA) _onPong();
+        if (row.first == 0x9) _onPing();
         return false;
       }
       return true;
@@ -44,11 +41,11 @@ class MessageRepository {
   }
 
   void _onPing() {
-    print('ping');
+    _channel.sink.add([0xA]);
   }
 
   void _onPong() {
-    // _channel.sink.add([0xA]);
+    print('_onPong');
   }
 
   /// Отправить сообщение

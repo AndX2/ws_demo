@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
 import 'package:ws_demo/domain/message.dart';
-import 'package:ws_demo/domain/room.dart';
+import 'package:ws_demo/domain/channel.dart';
 import 'package:ws_demo/repository/response/channel_response.dart';
 import 'package:ws_demo/repository/response/message_response.dart';
 import 'package:ws_demo/util/const.dart' as consts;

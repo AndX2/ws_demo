@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ws_demo/domain/profile.dart';
 import 'package:ws_demo/domain/sender.dart';
 
-/// Сообщение в комнате
+/// Сообщение в канале
 @immutable
 class Message extends Comparable {
   final DateTime created;
@@ -32,6 +32,7 @@ class Message extends Comparable {
   }
 }
 
+/// Расширение для UI
 extension MessageUiExt on Message {
   ChatMessageOwner isOwner(Profile profile) =>
       profile.id == owner.ownerId ? ChatMessageOwner.mine : ChatMessageOwner.other;
@@ -39,6 +40,7 @@ extension MessageUiExt on Message {
   Key get key => ValueKey(id ?? '$body#$created');
 }
 
+/// Перечисление, признак, является ли пользователь влядельщем данного сообщения
 enum ChatMessageOwner {
   mine,
   other,

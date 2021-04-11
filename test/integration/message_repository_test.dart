@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:ws_demo/di/di_container.dart';
-import 'package:ws_demo/domain/room.dart';
+import 'package:ws_demo/domain/channel.dart';
 import 'package:ws_demo/domain/socket_message.dart';
 import 'package:ws_demo/repository/message_repository.dart';
 

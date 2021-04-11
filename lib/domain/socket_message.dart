@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:ws_demo/domain/message.dart';
 import 'package:ws_demo/domain/sender.dart';
 
+/// Сообщение включая сведения о целевом канале
+/// предназначенное для сериализации во фрейм
 @immutable
 class SocketMessage extends Message {
   final String channel;
@@ -28,16 +30,3 @@ class SocketMessage extends Message {
         }
       };
 }
-
-final rowMsg = {
-  "channel": "quotes",
-  "message": {
-    "publicId": "7111b46f-6f0b-402c-b190-786f2917b89c",
-    "ownerId": "2d41c742-8436-4eb7-a458-4a2ab80fb7e6",
-    "ownerName": "Spamer",
-    "created": "2021-03-29T23:25:53.360511",
-    "assets": [],
-    "body":
-        "Всегда пишите код так, будто сопровождать его будет склонный к насилию психопат, который знает, где вы живете. Martin Golding"
-  }
-};
