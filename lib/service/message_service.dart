@@ -65,7 +65,7 @@ class MessageService {
     _shippingStreamController.sink.add(message);
     final channelList = _channelService.channelListObservable.value;
     final targetChannel = channelList.firstWhere(
-      (room) => room.name == message.channel,
+      (channel) => channel.name == message.channel,
       orElse: () => _addChannel(message),
     );
     if (!targetChannel.messageList.contains(message)) {
@@ -80,11 +80,11 @@ class MessageService {
   }
 
   Channel _addChannel(SocketMessage message) {
-    final roomList = _channelService.channelListObservable.value;
-    final room = Channel(message.channel)..messageList.add(message);
-    roomList.add(room);
-    _channelService.channelListObservable.add(roomList);
-    return room;
+    final channelList = _channelService.channelListObservable.value;
+    final channel = Channel(message.channel)..messageList.add(message);
+    channelList.add(channel);
+    _channelService.channelListObservable.add(channelList);
+    return channel;
   }
 
   void _applyDebouncedMessages() {
