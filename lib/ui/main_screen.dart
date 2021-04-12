@@ -7,8 +7,8 @@ import 'package:ws_demo/domain/profile.dart';
 import 'package:ws_demo/domain/channel.dart';
 import 'package:ws_demo/router.dart';
 import 'package:ws_demo/service/auth_service.dart';
-import 'package:ws_demo/service/channel_service.dart';
-import 'package:ws_demo/service/message_service.dart';
+// import 'package:ws_demo/service/channel_service.dart';
+// import 'package:ws_demo/service/message_service.dart';
 import 'package:ws_demo/ui/widget/bs_input.dart';
 import 'package:ws_demo/ui/widget/primary_btn.dart';
 import 'package:ws_demo/ui/widget/screen_back.dart';
@@ -212,14 +212,15 @@ class MainScreenModel extends WidgetModel {
   MainScreenModel(
     WidgetModelDependencies baseDependencies,
     this._rootNavigator,
-  )   : _channelService = getIt.get<ChannelService>(),
-        _messageService = getIt.get<MessageService>(),
+  )   :
+        // _channelService = getIt.get<ChannelService>(),
+        //       _messageService = getIt.get<MessageService>(),
         _authService = getIt.get<AuthService>(),
         super(baseDependencies);
 
   final NavigatorState _rootNavigator;
-  final ChannelService _channelService;
-  final MessageService _messageService;
+  // final ChannelService _channelService;
+  // final MessageService _messageService;
   final AuthService _authService;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final bsFormKey = GlobalKey<FormState>();
@@ -243,8 +244,8 @@ class MainScreenModel extends WidgetModel {
     super.onLoad();
     _authService.addListener(_authListener);
     _authListener();
-    subscribe<List<Channel>>(_channelService.channelListObservable.stream, _onChannelList);
-    _messageService.subscribe();
+    // subscribe<List<Channel>>(_channelService.channelListObservable.stream, _onChannelList);
+    // _messageService.subscribe();
   }
 
   @override
@@ -267,7 +268,7 @@ class MainScreenModel extends WidgetModel {
   void _authListener() {
     final isAuth = _authService.isAuthorized;
     if (isAuth != isAuthorizedState.value) isAuthorizedState.accept(isAuth);
-    if (isAuth) _channelService.getChannelList();
+    // if (isAuth) _channelService.getChannelList();
   }
 
   void _onRoomSelected(Channel room) async {

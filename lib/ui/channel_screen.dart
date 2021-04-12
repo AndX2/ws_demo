@@ -7,8 +7,8 @@ import 'package:ws_demo/domain/message.dart';
 import 'package:ws_demo/domain/profile.dart';
 import 'package:ws_demo/domain/channel.dart';
 import 'package:ws_demo/service/auth_service.dart';
-import 'package:ws_demo/service/channel_service.dart';
-import 'package:ws_demo/service/message_service.dart';
+// import 'package:ws_demo/service/channel_service.dart';
+// import 'package:ws_demo/service/message_service.dart';
 import 'package:ws_demo/ui/widget/channel_header.dart';
 import 'package:ws_demo/ui/widget/chat_message.dart';
 import 'package:ws_demo/ui/widget/screen_back.dart';
@@ -158,16 +158,17 @@ class RoomModel extends WidgetModel {
     WidgetModelDependencies dependencies,
     this.channelName,
     this._rootNavigator,
-  )   : _channelService = getIt.get<ChannelService>(),
-        _messageService = getIt.get<MessageService>(),
+  )   :
+        // _channelService = getIt.get<ChannelService>(),
+        //       _messageService = getIt.get<MessageService>(),
         _authService = getIt<AuthService>(),
         super(dependencies);
 
   /// пришедшие данные извне
   final String channelName;
   final NavigatorState _rootNavigator;
-  final ChannelService _channelService;
-  final MessageService _messageService;
+  // final ChannelService _channelService;
+  // final MessageService _messageService;
   final AuthService _authService;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -182,7 +183,7 @@ class RoomModel extends WidgetModel {
   void onLoad() {
     super.onLoad();
     _init();
-    subscribe<List<Channel>>(_channelService.channelListObservable.stream, _onRoomList);
+    // subscribe<List<Channel>>(_channelService.channelListObservable.stream, _onRoomList);
   }
 
   @override
@@ -196,25 +197,25 @@ class RoomModel extends WidgetModel {
     if (text.length == 0) return;
     shippingStageState.accept(true);
     bool isSuccess = true;
-    await _messageService.sendMessage(Channel(channelName), text).catchError(
-      (error) {
-        scaffoldKey.currentState.showSnackBar(
-          SnackBar(
-            content: Text('Произошла ошибка, попробуйте позже', style: StyleRes.content24Yellow),
-          ),
-        );
-        isSuccess = false;
-      },
-    );
+    // await _messageService.sendMessage(Channel(channelName), text).catchError(
+    //   (error) {
+    //     scaffoldKey.currentState.showSnackBar(
+    //       SnackBar(
+    //         content: Text('Произошла ошибка, попробуйте позже', style: StyleRes.content24Yellow),
+    //       ),
+    //     );
+    //     isSuccess = false;
+    //   },
+    // );
     if (isSuccess) inputMessageController.clear();
     shippingStageState.accept(false);
   }
 
   void _init() {
     profileState.accept(_authService.getProfile());
-    _channelService.getChannelHistory(Channel(channelName)).catchError(
-          (error) => print(error),
-        );
+    // _channelService.getChannelHistory(Channel(channelName)).catchError(
+    //       (error) => print(error),
+    //     );
   }
 
   void _onRoomList(List<Channel> list) {
