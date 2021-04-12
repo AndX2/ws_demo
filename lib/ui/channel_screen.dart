@@ -15,7 +15,7 @@ import 'package:ws_demo/ui/widget/screen_back.dart';
 import 'package:ws_demo/util/style.dart';
 import 'package:ws_demo/util/ui_util.dart';
 
-const _onMessageScrollDelay = Duration(milliseconds: 33);
+const _onMessageScrollDelay = Duration(milliseconds: 400);
 const _autoScrollSpeed = Duration(milliseconds: 400);
 
 /// Экран списка сообщений канала
@@ -226,7 +226,7 @@ class RoomModel extends WidgetModel {
   }
 
   void _scrollToEnd() async {
-    //FixMe: костыль. Время передачи состояния scrollController = 2 такта (16 * 2 ms)
+    /// Задержка скролла на время анимации роута CupertinoPageRoute
     await Future.delayed(_onMessageScrollDelay);
     if (!scrollController.hasClients) return;
     scrollController.animateTo(
