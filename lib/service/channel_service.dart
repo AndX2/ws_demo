@@ -8,12 +8,12 @@ import 'package:ws_demo/repository/channel_repository.dart';
 /// Сервис для операция с данными о каналах
 @singleton
 class ChannelService {
+  ChannelService(this._channelRepository);
+
   final ChannelRepository _channelRepository;
 
   // ignore: close_sinks
   final channelListObservable = BehaviorSubject<List<Channel>>.seeded([]);
-
-  ChannelService(this._channelRepository);
 
   /// Получить список каналов
   Future<void> getChannelList() async {
@@ -23,18 +23,18 @@ class ChannelService {
 
   /// Получить историю сообщений в канале
   Future<void> getChannelHistory(Channel channel) async {
-    final roomHistory = await _channelRepository.fetchMessageList(channel);
-    if (roomHistory != null) _setChannelHistory(channel, roomHistory);
+    final channelHistory = await _channelRepository.fetchMessageList(channel);
+    if (channelHistory != null) _setChannelHistory(channel, channelHistory);
   }
 
-  void _setChannelHistory(Channel room, List<Message> list) {
+  void _setChannelHistory(Channel channel, List<Message> list) {
     final currentChannel =
-        channelListObservable.value.firstWhere((item) => item == room, orElse: () => null);
+        channelListObservable.value.firstWhere((item) => item == channel, orElse: () => null);
     if (currentChannel != null) {
       currentChannel.messageList.clear();
       currentChannel.messageList.addAll(list);
     } else {
-      channelListObservable.value.add(room);
+      channelListObservable.value.add(channel);
     }
     channelListObservable.add(channelListObservable.value);
   }

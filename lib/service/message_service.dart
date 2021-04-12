@@ -57,22 +57,20 @@ class MessageService {
     final id = _uuid.v4();
     final timeout = Timer(_shippingTimeoute, () => throw Exception());
     _messageRepository.send(channel, body, id);
-    await _shippingStreamController.stream.firstWhere((message) {
-      timeout.cancel();
-      return message.id == id;
-    });
+    await _shippingStreamController.stream.firstWhere((message) => message.id == id);
+    timeout.cancel();
   }
 
   void _onReceiveMessage(SocketMessage message) {
     _shippingStreamController.sink.add(message);
     final channelList = _channelService.channelListObservable.value;
-    final targetRoom = channelList.firstWhere(
+    final targetChannel = channelList.firstWhere(
       (room) => room.name == message.channel,
       orElse: () => _addChannel(message),
     );
-    if (!targetRoom.messageList.contains(message)) {
+    if (!targetChannel.messageList.contains(message)) {
       if (_debounceTimer == null || !_debounceTimer.isActive) {
-        targetRoom.messageList.add(message);
+        targetChannel.messageList.add(message);
         _channelService.channelListObservable.add(channelList);
         _debounceTimer = Timer(_debounceTimeout, _applyDebouncedMessages);
       } else {
