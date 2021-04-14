@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:injectable/injectable.dart';
@@ -9,12 +10,6 @@ import 'package:ws_demo/repository/auth_interceptor.dart';
 import 'package:ws_demo/repository/request/message_request.dart';
 import 'package:ws_demo/repository/response/message_response.dart';
 
-/// Количество пропущенных heartbeat означающее разрыв соединения
-const _tolerance = 2;
-
-/// Периодичности heartbeat сообщений
-const _pingTimeout = Duration(seconds: 10);
-
 /// Репозиторий сообщений
 /// открытие ws канала происходит при создании инстанса репозитория
 /// [close()] закрывает канал
@@ -24,11 +19,13 @@ class MessageRepository {
 
   final WebSocketChannel _channel;
   final AuthInterceptor _authInterceptor;
+  final heartbeatStream = StreamController<void>.broadcast();
 
   /// Поток сообщений сервера
   Stream<SocketMessage> get stream {
     return _channel.stream.where((row) {
       print(row);
+      heartbeatStream.add(null);
       if (row is List<int> && row.length == 1) {
         if (row.first == 0xA) _onPong();
         if (row.first == 0x9) _onPing();
@@ -44,9 +41,7 @@ class MessageRepository {
     _channel.sink.add([0xA]);
   }
 
-  void _onPong() {
-    print('_onPong');
-  }
+  void _onPong() {}
 
   /// Отправить сообщение
   Future<void> send(
@@ -63,6 +58,7 @@ class MessageRepository {
 
   /// Закрыть канал
   void close() {
+    heartbeatStream.close();
     _channel.sink.close();
   }
 }

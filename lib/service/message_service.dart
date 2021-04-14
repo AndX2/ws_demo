@@ -19,6 +19,12 @@ const _shippingTimeoute = Duration(seconds: 10);
 /// Время подавления "дребезга"
 const _debounceTimeout = Duration(milliseconds: 1000);
 
+/// Количество пропущенных heartbeat означающее разрыв соединения
+const _tolerance = 2;
+
+/// Периодичности heartbeat сообщений
+const _pingTimeout = Duration(seconds: 10);
+
 /// Сервис для получения / отправки сообщений
 @singleton
 class MessageService {
@@ -30,14 +36,27 @@ class MessageService {
   // ignore: close_sinks
   final _shippingStreamController = StreamController<SocketMessage>.broadcast();
   final _uuid = Uuid();
+
   final _debouncedMessagesCache = <SocketMessage>[];
   Timer _debounceTimer;
+
+  Timer heartbeatTimer;
+  int _pings = 0;
 
   MessageService(
     this._preferenceRepository,
     this._channelService,
     this._lifeCycleRepository,
   ) : _messageRepository = getIt.get<MessageRepository>() {
+    _messageRepository.heartbeatStream.stream.listen(_heartbeatTicker);
+    heartbeatTimer = Timer.periodic(
+      _pingTimeout,
+      (_) {
+        if (_pings > _tolerance) _reConnect();
+        _messageRepository?.ping();
+        _pings++;
+      },
+    );
     _lifeCycleRepository.subscribe();
     _lifeCycleRepository.addListener(() => _lifeStateChanged(_lifeCycleRepository.state));
   }
@@ -46,7 +65,6 @@ class MessageService {
   void subscribe() {
     _messageRepository.stream.forEach(
       (SocketMessage message) {
-        print(message);
         _onReceiveMessage(message);
       },
     );
@@ -100,12 +118,19 @@ class MessageService {
     _debounceTimer = Timer(_debounceTimeout, _applyDebouncedMessages);
   }
 
+  void _heartbeatTicker(_) {
+    _pings = 0;
+  }
+
   void _lifeStateChanged(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) _messageRepository.close();
-    if (state == AppLifecycleState.resumed) {
-      _messageRepository = getIt.get<MessageRepository>();
-      subscribe();
-      _messageRepository.ping();
-    }
+    if (state == AppLifecycleState.resumed) _reConnect();
+  }
+
+  void _reConnect() {
+    _messageRepository?.close();
+    _messageRepository = getIt.get<MessageRepository>();
+    subscribe();
+    _messageRepository.heartbeatStream.stream.listen(_heartbeatTicker);
   }
 }
