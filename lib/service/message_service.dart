@@ -47,7 +47,8 @@ class MessageService {
     this._preferenceRepository,
     this._channelService,
     this._lifeCycleRepository,
-  ) : _messageRepository = getIt.get<MessageRepository>() {
+    this._messageRepository,
+  ) {
     _messageRepository.heartbeatStream.stream.listen(_heartbeatTicker);
     heartbeatTimer = Timer.periodic(
       _pingTimeout,
